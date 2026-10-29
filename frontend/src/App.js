@@ -11,39 +11,39 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// 🌍 DICCIONARIO DE 3 IDIOMAS (SIN EMOJIS)
+// 🌍 DICCIONARIO DE 3 IDIOMAS CON EL LOGO
 const textos = {
   es: {
-    titulo: <img src="/logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
+    titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Selecciona un distrito para ver su semáforo:",
     resultados: "Resultados",
     semaforo: "Semáforo",
     humedad: "Humedad",
     temperatura: "Temperatura",
     heladas: "Alerta de heladas",
-    si: "Sí ⚠️", 
+    si: "Sí", 
     no: "No",
   },
   qu: {
-    titulo: <img src="/logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
+    titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Huk distritota akllay, semáforonta rikunaykipaq:", 
     resultados: "Ruwasqa",
     semaforo: "Semáforo",
     humedad: "Humedad",
     temperatura: "Temperatura",
     heladas: "Chullu yaykuy",
-    si: "Arí ⚠️", 
+    si: "Arí", 
     no: "Mana",
   },
   en: {
-    titulo: <img src="/logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
+    titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Select a district to see its status:", 
     resultados: "Results",
     semaforo: "Status",
     humedad: "Humidity",
     temperatura: "Temperature",
     heladas: "Frost Alert",
-    si: "Yes ⚠️", 
+    si: "Yes", 
     no: "No",
   }
 };
@@ -69,7 +69,7 @@ function App() {
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
       
-      {/* Barra superior con el selector de idiomas SIN EMOJIS */}
+      {/* Barra superior con el selector de idiomas */}
       <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center', position: 'relative' }}>
         
         <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
@@ -84,7 +84,6 @@ function App() {
           </select>
         </div>
 
-        {/* Aquí se muestra el logo */}
         <div>{t.titulo}</div>
         
         <p style={{ margin: 0, marginTop: '10px' }}>{t.subtitulo}</p>
@@ -96,7 +95,7 @@ function App() {
         </div>
       </div>
 
-      {/* Mapa de fondo */}
+      {/* Mapa */}
       <div style={{ flex: 1 }}>
         <MapContainer center={[-12.0464, -77.0428]} zoom={6} style={{ height: '100%', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
