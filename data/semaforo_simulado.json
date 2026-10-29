@@ -1,0 +1,26 @@
+{
+  "Huancayo": {
+    "lat": -12.0651,
+    "lon": -75.2049,
+    "color": "verde",
+    "humedad": 0.35,
+    "temperatura": 18.5,
+    "alerta_heladas": false
+  },
+  "Pucara": {
+    "lat": -12.15,
+    "lon": -75.15,
+    "color": "amarillo",
+    "humedad": 0.22,
+    "temperatura": 12.0,
+    "alerta_heladas": true
+  },
+  "Ayacucho": {
+    "lat": -13.1588,
+    "lon": -74.2236,
+    "color": "rojo",
+    "humedad": 0.1,
+    "temperatura": 8.0,
+    "alerta_heladas": true
+  }
+}

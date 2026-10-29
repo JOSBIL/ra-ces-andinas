@@ -1,0 +1,12 @@
+# Ignorar el archivo gigante de la NASA
+Backend/SMAP_L4_SM_gph_20221231T223000_Vv8010_001.h5
+
+# Ignorar las librerías de React (pesan mucho)
+frontend/node_modules/
+
+# Ignorar el entorno virtual de Python
+Backend/venv/
+
+# Ignorar archivos temporales
+__pycache__/
+*.pyc
