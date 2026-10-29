@@ -11,39 +11,39 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// 🌍 DICCIONARIO DE 3 IDIOMAS
+// 🌍 DICCIONARIO DE 3 IDIOMAS (SIN EMOJIS)
 const textos = {
   es: {
-    titulo: "🌱 Raíces Andinas",
+    titulo: <img src="/logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Selecciona un distrito para ver su semáforo:",
     resultados: "Resultados",
     semaforo: "Semáforo",
     humedad: "Humedad",
     temperatura: "Temperatura",
     heladas: "Alerta de heladas",
-    si: "Sí ⚠️",
+    si: "Sí ⚠️", 
     no: "No",
   },
   qu: {
-    titulo: "🌱 Raíces Andinas",
+    titulo: <img src="/logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Huk distritota akllay, semáforonta rikunaykipaq:", 
     resultados: "Ruwasqa",
     semaforo: "Semáforo",
     humedad: "Humedad",
     temperatura: "Temperatura",
     heladas: "Chullu yaykuy",
-    si: "Arí ⚠️",
+    si: "Arí ⚠️", 
     no: "Mana",
   },
   en: {
-    titulo: "🌱 Andean Roots",
+    titulo: <img src="/logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Select a district to see its status:", 
     resultados: "Results",
     semaforo: "Status",
     humedad: "Humidity",
     temperatura: "Temperature",
     heladas: "Frost Alert",
-    si: "Yes ⚠️",
+    si: "Yes ⚠️", 
     no: "No",
   }
 };
@@ -51,7 +51,7 @@ const textos = {
 function App() {
   const [distrito, setDistrito] = useState('Huancayo');
   const [datos, setDatos] = useState(null);
-  const [idioma, setIdioma] = useState('es'); // Por defecto: Español
+  const [idioma, setIdioma] = useState('es'); 
 
   const consultarSemaforo = async (nombreDistrito) => {
     setDistrito(nombreDistrito);
@@ -64,29 +64,30 @@ function App() {
     }
   };
 
-  const t = textos[idioma]; // Variable para llamar al diccionario
+  const t = textos[idioma]; 
 
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
       
-      {/* Barra superior con el selector de idiomas */}
+      {/* Barra superior con el selector de idiomas SIN EMOJIS */}
       <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center', position: 'relative' }}>
         
-        {/* Selector de idioma arriba a la derecha */}
         <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
           <select 
             onChange={(e) => setIdioma(e.target.value)} 
             value={idioma} 
             style={{ padding: '8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
           >
-            <option value="es">Español 🇵🇪</option>
-            <option value="qu">Quechua 🏔️</option>
-            <option value="en">English 🇺🇸</option>
+            <option value="es">Español</option>
+            <option value="qu">Quechua</option>
+            <option value="en">English</option>
           </select>
         </div>
 
-        <h2>{t.titulo}</h2>
-        <p style={{ margin: 0 }}>{t.subtitulo}</p>
+        {/* Aquí se muestra el logo */}
+        <div>{t.titulo}</div>
+        
+        <p style={{ margin: 0, marginTop: '10px' }}>{t.subtitulo}</p>
         
         <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
           <button onClick={() => consultarSemaforo('Huancayo')} style={{ padding: '8px 15px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>Huancayo</button>
