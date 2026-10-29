@@ -11,7 +11,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// 🌍 DICCIONARIO DE 3 IDIOMAS CON EL LOGO
+// 🌍 DICCIONARIO DE 3 IDIOMAS CON EL LOGO Y ALERTAS MEJORADAS
 const textos = {
   es: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -21,8 +21,9 @@ const textos = {
     humedad: "Humedad",
     temperatura: "Temperatura",
     heladas: "Alerta de heladas",
-    si: "Sí", 
+    si: "Sí",
     no: "No",
+    peligro: "¡RIESGO!"
   },
   qu: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -32,8 +33,9 @@ const textos = {
     humedad: "Humedad",
     temperatura: "Temperatura",
     heladas: "Chullu yaykuy",
-    si: "Arí", 
+    si: "Arí",
     no: "Mana",
+    peligro: "¡MANCHAY!"
   },
   en: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -43,8 +45,9 @@ const textos = {
     humedad: "Humidity",
     temperatura: "Temperature",
     heladas: "Frost Alert",
-    si: "Yes", 
+    si: "Yes",
     no: "No",
+    peligro: "WARNING!"
   }
 };
 
@@ -95,7 +98,7 @@ function App() {
         </div>
       </div>
 
-      {/* Mapa */}
+      {/* Mapa de fondo */}
       <div style={{ flex: 1 }}>
         <MapContainer center={[-12.0464, -77.0428]} zoom={6} style={{ height: '100%', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -123,12 +126,24 @@ function App() {
 
           <p style={{ margin: '5px 0' }}><strong>{t.humedad}:</strong> {datos.humedad}</p>
           <p style={{ margin: '5px 0' }}><strong>{t.temperatura}:</strong> {datos.temperatura} °C</p>
-          <p style={{ margin: '5px 0' }}>
-            <strong>{t.heladas}:</strong> 
-            <span style={{ color: datos.alerta_heladas ? 'red' : 'green', marginLeft: '5px' }}>
-              {datos.alerta_heladas ? t.si : t.no}
-            </span>
-          </p>
+          
+          {/* ALERTA DE HELADAS MEJORADA CON ICONO Y FONDO ROJO */}
+          <div style={{ marginTop: '10px' }}>
+            <strong>{t.heladas}: </strong>
+            {datos.alerta_heladas ? (
+              <span style={{ 
+                backgroundColor: '#F44336', color: 'white', padding: '4px 8px', 
+                borderRadius: '5px', fontSize: '13px', marginLeft: '5px', fontWeight: 'bold' 
+              }}>
+                ⚠️ {t.si} - {t.peligro}
+              </span>
+            ) : (
+              <span style={{ color: 'green', marginLeft: '5px', fontWeight: 'bold' }}>
+                {t.no}
+              </span>
+            )}
+          </div>
+
         </div>
       )}
     </div>
