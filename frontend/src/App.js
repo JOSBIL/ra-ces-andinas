@@ -11,43 +11,25 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// 🌍 DICCIONARIO DE 3 IDIOMAS CON EL LOGO Y ALERTAS MEJORADAS
+// 🌍 DICCIONARIO DE 3 IDIOMAS
 const textos = {
   es: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Selecciona un distrito para ver su semáforo:",
-    resultados: "Resultados",
-    semaforo: "Semáforo",
-    humedad: "Humedad",
-    temperatura: "Temperatura",
-    heladas: "Alerta de heladas",
-    si: "Sí",
-    no: "No",
-    peligro: "¡RIESGO!"
+    resultados: "Resultados", semaforo: "Semáforo", humedad: "Humedad", temperatura: "Temperatura",
+    heladas: "Alerta de heladas", si: "Sí", no: "No", peligro: "¡RIESGO!"
   },
   qu: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Huk distritota akllay, semáforonta rikunaykipaq:", 
-    resultados: "Ruwasqa",
-    semaforo: "Semáforo",
-    humedad: "Humedad",
-    temperatura: "Temperatura",
-    heladas: "Chullu yaykuy",
-    si: "Arí",
-    no: "Mana",
-    peligro: "¡MANCHAY!"
+    resultados: "Ruwasqa", semaforo: "Semáforo", humedad: "Humedad", temperatura: "Temperatura",
+    heladas: "Chullu yaykuy", si: "Arí", no: "Mana", peligro: "¡MANCHAY!"
   },
   en: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
     subtitulo: "Select a district to see its status:", 
-    resultados: "Results",
-    semaforo: "Status",
-    humedad: "Humidity",
-    temperatura: "Temperature",
-    heladas: "Frost Alert",
-    si: "Yes",
-    no: "No",
-    peligro: "WARNING!"
+    resultados: "Results", semaforo: "Status", humedad: "Humidity", temperatura: "Temperature",
+    heladas: "Frost Alert", si: "Yes", no: "No", peligro: "WARNING!"
   }
 };
 
@@ -72,15 +54,11 @@ function App() {
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
       
-      {/* Barra superior con el selector de idiomas */}
+      {/* Barra superior con el selector de idiomas y botones */}
       <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center', position: 'relative' }}>
         
         <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
-          <select 
-            onChange={(e) => setIdioma(e.target.value)} 
-            value={idioma} 
-            style={{ padding: '8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
-          >
+          <select onChange={(e) => setIdioma(e.target.value)} value={idioma} style={{ padding: '8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
             <option value="es">Español</option>
             <option value="qu">Quechua</option>
             <option value="en">English</option>
@@ -88,62 +66,60 @@ function App() {
         </div>
 
         <div>{t.titulo}</div>
-        
         <p style={{ margin: 0, marginTop: '10px' }}>{t.subtitulo}</p>
         
-        <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
-          <button onClick={() => consultarSemaforo('Huancayo')} style={{ padding: '8px 15px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>Huancayo</button>
-          <button onClick={() => consultarSemaforo('Pucara')} style={{ padding: '8px 15px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>Pucará</button>
-          <button onClick={() => consultarSemaforo('Ayacucho')} style={{ padding: '8px 15px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>Ayacucho</button>
+        {/* Los 11 botones */}
+        <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px' }}>
+          {['Huancayo', 'Chupuro', 'Tres de Diciembre', 'Viques', 'Sapallanga', 'Pucara', 'Ingenio', 'Huayucachi', 'Ayacucho', 'Cangallo', 'Huanta', 'Vilcashuaman'].map((lugar) => (
+            <button key={lugar} onClick={() => consultarSemaforo(lugar)} style={{ padding: '6px 12px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '14px' }}>
+              {lugar}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Mapa de fondo */}
+      {/* Mapa de fondo con los marcadores de las 11 zonas */}
       <div style={{ flex: 1 }}>
-        <MapContainer center={[-12.0464, -77.0428]} zoom={6} style={{ height: '100%', width: '100%' }}>
+        <MapContainer center={[-12.5, -75.0]} zoom={7} style={{ height: '100%', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          
           <Marker position={[-12.0651, -75.2049]}><Popup>Huancayo</Popup></Marker>
+          <Marker position={[-12.0800, -75.1900]}><Popup>Chupuro</Popup></Marker>
+          <Marker position={[-12.0500, -75.2200]}><Popup>Tres de Diciembre</Popup></Marker>
           <Marker position={[-12.1500, -75.1500]}><Popup>Pucará</Popup></Marker>
+          <Marker position={[-12.1800, -75.1900]}><Popup>Viques</Popup></Marker>
+          <Marker position={[-12.1200, -75.1800]}><Popup>Sapallanga</Popup></Marker>
+          <Marker position={[-12.1000, -75.2500]}><Popup>Ingenio</Popup></Marker>
+          <Marker position={[-12.1300, -75.2300]}><Popup>Huayucachi</Popup></Marker>
+          
           <Marker position={[-13.1588, -74.2236]}><Popup>Ayacucho</Popup></Marker>
+          <Marker position={[-13.6300, -74.1400]}><Popup>Cangallo</Popup></Marker>
+          <Marker position={[-12.9300, -74.2500]}><Popup>Huanta</Popup></Marker>
+          <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
       </div>
 
-      {/* Panel de resultados */}
+      {/* Panel de resultados con la alerta roja */}
       {datos && (
-        <div style={{ 
-          position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000, 
-          backgroundColor: 'white', padding: '20px', borderRadius: '10px', 
-          boxShadow: '0 4px 8px rgba(0,0,0,0.3)', width: '250px' 
-        }}>
+        <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000, backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.3)', width: '280px' }}>
           <h3 style={{ margin: '0 0 10px 0' }}>{t.resultados}: {distrito}</h3>
           
           <p style={{ margin: '5px 0' }}><strong>{t.semaforo}:</strong> 
-            <span style={{ 
-              display: 'inline-block', width: '15px', height: '15px', borderRadius: '50%', marginLeft: '10px',
-              backgroundColor: datos.color === 'verde' ? '#4CAF50' : datos.color === 'amarillo' ? '#FFC107' : datos.color === 'rojo' ? '#F44336' : 'gray'
-            }}></span>
+            <span style={{ display: 'inline-block', width: '15px', height: '15px', borderRadius: '50%', marginLeft: '10px', backgroundColor: datos.color === 'verde' ? '#4CAF50' : datos.color === 'amarillo' ? '#FFC107' : datos.color === 'rojo' ? '#F44336' : 'gray' }}></span>
           </p>
-
           <p style={{ margin: '5px 0' }}><strong>{t.humedad}:</strong> {datos.humedad}</p>
           <p style={{ margin: '5px 0' }}><strong>{t.temperatura}:</strong> {datos.temperatura} °C</p>
           
-          {/* ALERTA DE HELADAS MEJORADA CON ICONO Y FONDO ROJO */}
           <div style={{ marginTop: '10px' }}>
             <strong>{t.heladas}: </strong>
             {datos.alerta_heladas ? (
-              <span style={{ 
-                backgroundColor: '#F44336', color: 'white', padding: '4px 8px', 
-                borderRadius: '5px', fontSize: '13px', marginLeft: '5px', fontWeight: 'bold' 
-              }}>
+              <span style={{ backgroundColor: '#F44336', color: 'white', padding: '4px 8px', borderRadius: '5px', fontSize: '13px', marginLeft: '5px', fontWeight: 'bold' }}>
                 ⚠️ {t.si} - {t.peligro}
               </span>
             ) : (
-              <span style={{ color: 'green', marginLeft: '5px', fontWeight: 'bold' }}>
-                {t.no}
-              </span>
+              <span style={{ color: 'green', marginLeft: '5px', fontWeight: 'bold' }}>{t.no}</span>
             )}
           </div>
-
         </div>
       )}
     </div>
