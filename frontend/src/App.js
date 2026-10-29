@@ -11,11 +11,48 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
+// 🌍 DICCIONARIO DE 3 IDIOMAS
+const textos = {
+  es: {
+    titulo: "🌱 Raíces Andinas",
+    subtitulo: "Selecciona un distrito para ver su semáforo:",
+    resultados: "Resultados",
+    semaforo: "Semáforo",
+    humedad: "Humedad",
+    temperatura: "Temperatura",
+    heladas: "Alerta de heladas",
+    si: "Sí ⚠️",
+    no: "No",
+  },
+  qu: {
+    titulo: "🌱 Raíces Andinas",
+    subtitulo: "Huk distritota akllay, semáforonta rikunaykipaq:", 
+    resultados: "Ruwasqa",
+    semaforo: "Semáforo",
+    humedad: "Humedad",
+    temperatura: "Temperatura",
+    heladas: "Chullu yaykuy",
+    si: "Arí ⚠️",
+    no: "Mana",
+  },
+  en: {
+    titulo: "🌱 Andean Roots",
+    subtitulo: "Select a district to see its status:", 
+    resultados: "Results",
+    semaforo: "Status",
+    humedad: "Humidity",
+    temperatura: "Temperature",
+    heladas: "Frost Alert",
+    si: "Yes ⚠️",
+    no: "No",
+  }
+};
+
 function App() {
   const [distrito, setDistrito] = useState('Huancayo');
   const [datos, setDatos] = useState(null);
+  const [idioma, setIdioma] = useState('es'); // Por defecto: Español
 
-  // Esta función se conecta con tu backend de Python
   const consultarSemaforo = async (nombreDistrito) => {
     setDistrito(nombreDistrito);
     try {
@@ -27,12 +64,30 @@ function App() {
     }
   };
 
+  const t = textos[idioma]; // Variable para llamar al diccionario
+
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Barra superior de la app */}
-      <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center' }}>
-        <h2>🌱 Raíces Andinas</h2>
-        <p style={{ margin: 0 }}>Selecciona un distrito para ver su semáforo:</p>
+      
+      {/* Barra superior con el selector de idiomas */}
+      <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center', position: 'relative' }}>
+        
+        {/* Selector de idioma arriba a la derecha */}
+        <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
+          <select 
+            onChange={(e) => setIdioma(e.target.value)} 
+            value={idioma} 
+            style={{ padding: '8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            <option value="es">Español 🇵🇪</option>
+            <option value="qu">Quechua 🏔️</option>
+            <option value="en">English 🇺🇸</option>
+          </select>
+        </div>
+
+        <h2>{t.titulo}</h2>
+        <p style={{ margin: 0 }}>{t.subtitulo}</p>
+        
         <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
           <button onClick={() => consultarSemaforo('Huancayo')} style={{ padding: '8px 15px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>Huancayo</button>
           <button onClick={() => consultarSemaforo('Pucara')} style={{ padding: '8px 15px', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>Pucará</button>
@@ -44,41 +99,34 @@ function App() {
       <div style={{ flex: 1 }}>
         <MapContainer center={[-12.0464, -77.0428]} zoom={6} style={{ height: '100%', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          
-          <Marker position={[-12.0651, -75.2049]}>
-            <Popup>Huancayo</Popup>
-          </Marker>
-          <Marker position={[-12.1500, -75.1500]}>
-            <Popup>Pucará</Popup>
-          </Marker>
-          <Marker position={[-13.1588, -74.2236]}>
-            <Popup>Ayacucho</Popup>
-          </Marker>
+          <Marker position={[-12.0651, -75.2049]}><Popup>Huancayo</Popup></Marker>
+          <Marker position={[-12.1500, -75.1500]}><Popup>Pucará</Popup></Marker>
+          <Marker position={[-13.1588, -74.2236]}><Popup>Ayacucho</Popup></Marker>
         </MapContainer>
       </div>
 
-      {/* Panel de resultados (Muestra los datos del backend) */}
+      {/* Panel de resultados */}
       {datos && (
         <div style={{ 
           position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000, 
           backgroundColor: 'white', padding: '20px', borderRadius: '10px', 
           boxShadow: '0 4px 8px rgba(0,0,0,0.3)', width: '250px' 
         }}>
-          <h3 style={{ margin: '0 0 10px 0' }}>Resultados: {distrito}</h3>
+          <h3 style={{ margin: '0 0 10px 0' }}>{t.resultados}: {distrito}</h3>
           
-          <p style={{ margin: '5px 0' }}><strong>Semáforo:</strong> 
+          <p style={{ margin: '5px 0' }}><strong>{t.semaforo}:</strong> 
             <span style={{ 
               display: 'inline-block', width: '15px', height: '15px', borderRadius: '50%', marginLeft: '10px',
               backgroundColor: datos.color === 'verde' ? '#4CAF50' : datos.color === 'amarillo' ? '#FFC107' : datos.color === 'rojo' ? '#F44336' : 'gray'
             }}></span>
           </p>
 
-          <p style={{ margin: '5px 0' }}><strong>Humedad:</strong> {datos.humedad}</p>
-          <p style={{ margin: '5px 0' }}><strong>Temperatura:</strong> {datos.temperatura} °C</p>
+          <p style={{ margin: '5px 0' }}><strong>{t.humedad}:</strong> {datos.humedad}</p>
+          <p style={{ margin: '5px 0' }}><strong>{t.temperatura}:</strong> {datos.temperatura} °C</p>
           <p style={{ margin: '5px 0' }}>
-            <strong>Alerta de heladas:</strong> 
+            <strong>{t.heladas}:</strong> 
             <span style={{ color: datos.alerta_heladas ? 'red' : 'green', marginLeft: '5px' }}>
-              {datos.alerta_heladas ? 'SÍ ⚠️' : 'No'}
+              {datos.alerta_heladas ? t.si : t.no}
             </span>
           </p>
         </div>
