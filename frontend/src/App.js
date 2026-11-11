@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -18,10 +18,12 @@ const textos = {
     resultados: "Resultados", semaforo: "Semáforo", humedad: "Humedad", temperatura: "Temperatura",
     heladas: "Alerta de heladas", si: "Sí", no: "No", peligro: "¡RIESGO!",
     soleado: "Día soleado por 6 horas aprox.", lluvia: "Lluvia ligera por 2 horas aprox.", helada: "Riesgo de helada por 3 horas aprox.",
-    // MENSAJES NUEVOS
     msj_verde: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy es óptimo y soleado. Es un buen día para sembrar y trabajar la tierra.",
     msj_amarillo: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy presenta lluvias ligeras. Te recomiendo tomar precauciones y proteger tus cultivos.",
-    msj_rojo: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy es alerta de caída de helada. Se advierte tomar precauciones para prevenir pérdidas de cultivos."
+    msj_rojo: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy es alerta de caída de helada. Se advierte tomar precauciones para prevenir pérdidas de cultivos.",
+    instalar: "📲 Instalar App",
+    guia: "👋 ¡Hola! Selecciona un distrito arriba para ver el clima",
+    actualizado: "Actualizado: "
   },
   qu: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -31,7 +33,10 @@ const textos = {
     soleado: "Inti punchaw 6 hora", lluvia: "Para 2 hora", helada: "Chullu 3 hora",
     msj_verde: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa allin inti p'unchawmi. Allinmi tarpunaykipaq.",
     msj_amarillo: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa param kachkanmi. Allichakuy, chakraykita waqaychay.",
-    msj_rojo: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa chullu yaykuyninmi. ¡Allichakuy, chakraykita ama chinkachinaykipaq!"
+    msj_rojo: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa chullu yaykuyninmi. ¡Allichakuy, chakraykita ama chinkachinaykipaq!",
+    instalar: "📲 App churay",
+    guia: "👋 ¡Allillanchu! Huk distritota akllay",
+    actualizado: "Kunan: "
   },
   en: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -41,7 +46,10 @@ const textos = {
     soleado: "Sunny day for approx. 6 hours", lluvia: "Light rain for approx. 2 hours", helada: "Frost risk for approx. 3 hours",
     msj_verde: "Hello friend! I am Raíces Andinas. Today's weather is optimal and sunny. It is a good day to plant and work the land.",
     msj_amarillo: "Hello friend! I am Raíces Andinas. Today's weather shows light rain. I recommend taking precautions and protecting your crops.",
-    msj_rojo: "Hello friend! I am Raíces Andinas. Today's weather is a frost alert. Precautions are advised to prevent crop losses."
+    msj_rojo: "Hello friend! I am Raíces Andinas. Today's weather is a frost alert. Precautions are advised to prevent crop losses.",
+    instalar: "📲 Install App",
+    guia: "👋 Hello! Select a district above to see the weather",
+    actualizado: "Updated: "
   }
 };
 
@@ -49,6 +57,16 @@ function App() {
   const [distrito, setDistrito] = useState('Huancayo');
   const [datos, setDatos] = useState(null);
   const [idioma, setIdioma] = useState('es'); 
+  const [horaActual, setHoraActual] = useState('');
+
+  // Reloj en vivo
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const ahora = new Date();
+      setHoraActual(ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const consultarSemaforo = async (nombreDistrito) => {
     setDistrito(nombreDistrito);
@@ -63,7 +81,7 @@ function App() {
 
   const t = textos[idioma]; 
 
-  // Función para elegir la foto, el mensaje de horas y el nuevo mensaje de alerta
+  // Función para elegir la foto, el mensaje de horas y el mensaje de alerta
   const obtenerClima = (color) => {
     if (color === 'verde') return { foto: 'sol.jpg', mensaje: t.soleado, alerta: t.msj_verde };
     if (color === 'amarillo') return { foto: 'lluvia.jpg', mensaje: t.lluvia, alerta: t.msj_amarillo };
@@ -76,6 +94,12 @@ function App() {
       
       <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center', position: 'relative' }}>
         
+        {/* Reloj y Botón de Instalar (Izquierda y Derecha) */}
+        <div style={{ position: 'absolute', left: '20px', top: '20px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+           <span>{t.actualizado} {horaActual}</span>
+           <button onClick={() => alert("Para instalar: Toca el menú del navegador y selecciona 'Agregar a pantalla principal'")} style={{ padding: '5px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '12px', backgroundColor: '#FFF', color: '#2E7D32', fontWeight: 'bold' }}>{t.instalar}</button>
+        </div>
+
         <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
           <select onChange={(e) => setIdioma(e.target.value)} value={idioma} style={{ padding: '8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
             <option value="es">Español</option>
@@ -96,7 +120,7 @@ function App() {
         </div>
       </div>
 
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, position: 'relative' }}>
         <MapContainer center={[-12.5, -75.0]} zoom={7} style={{ height: '100%', width: '100%' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           
@@ -115,12 +139,18 @@ function App() {
           <Marker position={[-12.9300, -74.2500]}><Popup>Huanta</Popup></Marker>
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
+
+        {/* Mensaje flotante guía en el mapa */}
+        {!datos && (
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '20px', borderRadius: '10px', zIndex: 1000, textAlign: 'center', boxShadow: '0 4px 8px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ margin: 0, color: '#2E7D32' }}>{t.guia}</h3>
+          </div>
+        )}
       </div>
 
       {datos && (
         <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000, backgroundColor: 'white', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.3)', width: '320px', overflow: 'hidden' }}>
           
-          {/* FOTO DEL CLIMA Y MENSAJE DE HORAS */}
           <div style={{ position: 'relative' }}>
             <img src={obtenerClima(datos.color).foto} alt="Clima" style={{ width: '100%', height: '120px', objectFit: 'cover' }} />
             <div style={{ position: 'absolute', bottom: '0', width: '100%', backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '5px', textAlign: 'center', fontSize: '13px', fontWeight: 'bold' }}>
@@ -130,7 +160,6 @@ function App() {
 
           <div style={{ padding: '15px' }}>
             
-            {/* EL NUEVO MENSAJE DE ALERTA */}
             <div style={{ 
               backgroundColor: '#F5F5F5', padding: '10px', borderRadius: '8px', marginBottom: '15px',
               borderLeft: `5px solid ${datos.color === 'verde' ? '#4CAF50' : datos.color === 'amarillo' ? '#FFC107' : '#F44336'}`
