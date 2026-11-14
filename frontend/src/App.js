@@ -11,6 +11,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
+// Animación para la alpaca
+const estiloAnimacion = `
+  @keyframes caminar {
+    0% { transform: translateX(0px); }
+    50% { transform: translateX(60px); }
+    100% { transform: translateX(0px); }
+  }
+`;
+
 const textos = {
   es: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -140,12 +149,14 @@ function App() {
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
 
-        {/* Mascota Alpaca Guía en el mapa (CENTRADA) */}
+        {/* Mascota Alpaca Animada y Centrada */}
         {!datos && (
           <div style={{ 
-            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
+            position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)', 
             zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center'
           }}>
+            <style>{estiloAnimacion}</style>
+            
             <div style={{ 
               backgroundColor: 'white', padding: '15px', borderRadius: '15px', 
               boxShadow: '0 4px 8px rgba(0,0,0,0.3)', marginBottom: '10px',
@@ -158,7 +169,13 @@ function App() {
                 {t.alpaca_instruccion}
               </p>
             </div>
-            <div style={{ fontSize: '80px', filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' }}>
+            
+            {/* La alpaca con la animación */}
+            <div style={{ 
+              fontSize: '80px', 
+              animation: 'caminar 4s infinite ease-in-out',
+              filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' 
+            }}>
               🦙
             </div>
           </div>
