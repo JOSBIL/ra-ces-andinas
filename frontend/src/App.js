@@ -1,197 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import './App.css';
+import Calendario from './Calendario';
+import Siembras, { cultivos as fichasCultivos } from './Siembras';
+import { referencias, regiones } from './zonas';
+import Buscador from './Buscador';
+import Seguimiento from './Seguimiento';
+import Asistente from './Asistente';
+import FichaParcela, { leerFicha } from './FichaParcela';
+import Ecostress from './Ecostress';
 
-// Corregir un pequeño error visual de los íconos del mapa
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
-
-const textos = {
-  es: {
-    titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
-    subtitulo: "Selecciona un distrito para ver su semáforo:",
-    resultados: "Resultados", semaforo: "Semáforo", humedad: "Humedad", temperatura: "Temperatura",
-    heladas: "Alerta de heladas", si: "Sí", no: "No", peligro: "¡RIESGO!",
-    soleado: "Día soleado por 6 horas aprox.", lluvia: "Lluvia ligera por 2 horas aprox.", helada: "Riesgo de helada por 3 horas aprox.",
-    msj_verde: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy es óptimo y soleado. Es un buen día para sembrar y trabajar la tierra.",
-    msj_amarillo: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy presenta lluvias ligeras. Te recomiendo tomar precauciones y proteger tus cultivos.",
-    msj_rojo: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy es alerta de caída de helada. Se advierte tomar precauciones para prevenir pérdidas de cultivos.",
-    instalar: "📲 Instalar App",
-    guia: "👋 ¡Hola! Selecciona un distrito arriba para ver el clima",
-    actualizado: "Actualizado: "
-  },
-  qu: {
-    titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
-    subtitulo: "Huk distritota akllay, semáforonta rikunaykipaq:", 
-    resultados: "Ruwasqa", semaforo: "Semáforo", humedad: "Humedad", temperatura: "Temperatura",
-    heladas: "Chullu yaykuy", si: "Arí", no: "Mana", peligro: "¡MANCHAY!",
-    soleado: "Inti punchaw 6 hora", lluvia: "Para 2 hora", helada: "Chullu 3 hora",
-    msj_verde: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa allin inti p'unchawmi. Allinmi tarpunaykipaq.",
-    msj_amarillo: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa param kachkanmi. Allichakuy, chakraykita waqaychay.",
-    msj_rojo: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa chullu yaykuyninmi. ¡Allichakuy, chakraykita ama chinkachinaykipaq!",
-    instalar: "📲 App churay",
-    guia: "👋 ¡Allillanchu! Huk distritota akllay",
-    actualizado: "Kunan: "
-  },
-  en: {
-    titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
-    subtitulo: "Select a district to see its status:", 
-    resultados: "Results", semaforo: "Status", humedad: "Humidity", temperatura: "Temperature",
-    heladas: "Frost Alert", si: "Yes", no: "No", peligro: "WARNING!",
-    soleado: "Sunny day for approx. 6 hours", lluvia: "Light rain for approx. 2 hours", helada: "Frost risk for approx. 3 hours",
-    msj_verde: "Hello friend! I am Raíces Andinas. Today's weather is optimal and sunny. It is a good day to plant and work the land.",
-    msj_amarillo: "Hello friend! I am Raíces Andinas. Today's weather shows light rain. I recommend taking precautions and protecting your crops.",
-    msj_rojo: "Hello friend! I am Raíces Andinas. Today's weather is a frost alert. Precautions are advised to prevent crop losses.",
-    instalar: "📲 Install App",
-    guia: "👋 Hello! Select a district above to see the weather",
-    actualizado: "Updated: "
-  }
-};
+const API = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
+const formato = (valor, unidad) => `${Number(valor).toLocaleString('es-PE', { maximumFractionDigits: 1 })} ${unidad}`;
+function CentrarMapa({ lugar }) { const mapa = useMap(); useEffect(() => { if (lugar?.etiqueta) mapa.flyTo([lugar.latitud, lugar.longitud], 11); }, [mapa, lugar]); return null; }
+function CentrarUbicacion({ ubicacion }) { const mapa = useMap(); useEffect(() => { if (ubicacion) mapa.flyTo([ubicacion.latitud, ubicacion.longitud], 16); }, [mapa, ubicacion]); return null; }
 
 function App() {
+  const [lugares, setLugares] = useState([]);
   const [distrito, setDistrito] = useState('Huancayo');
+  const [mesSiembra, setMesSiembra] = useState(() => new Date().getMonth());
+  const [vistaSatelital, setVistaSatelital] = useState(false);
+  const [errorImagen, setErrorImagen] = useState(false);
+  const [ubicacion, setUbicacion] = useState(null);
+  const [ficha, setFicha] = useState(leerFicha);
+  const [estadoUbicacion, setEstadoUbicacion] = useState('Aún no has compartido tu ubicación.');
   const [datos, setDatos] = useState(null);
-  const [idioma, setIdioma] = useState('es'); 
-  const [horaActual, setHoraActual] = useState('');
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+  const [errorLugares, setErrorLugares] = useState(false);
+  const [intento, setIntento] = useState(0);
+  const solicitarUbicacion = () => {
+    if (!navigator.geolocation) { setEstadoUbicacion('Este navegador no permite acceder a la ubicación.'); return; }
+    setEstadoUbicacion('Buscando tu ubicación…');
+    navigator.geolocation.getCurrentPosition(pos => {
+      setUbicacion({ latitud: pos.coords.latitude, longitud: pos.coords.longitude, precision: pos.coords.accuracy });
+      setEstadoUbicacion('Ubicación encontrada. Comprueba el punto en el mapa.');
+      setVistaSatelital(true); setErrorImagen(false);
+    }, err => setEstadoUbicacion(err.code === 1 ? 'Permiso de ubicación denegado. Revisa los permisos del navegador.' : 'No se pudo obtener la ubicación. Comprueba el GPS e inténtalo de nuevo.'), { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+  };
+  const seleccionarLugar = lugar => {
+    regiones[lugar.id] = lugar.region;
+    setLugares(actual => [...actual.filter(l => l.nombre !== lugar.id), { ...lugar, nombre: lugar.id, etiqueta: `${lugar.nombre} · ${lugar.distrito}, ${lugar.provincia}` }]);
+    setDistrito(lugar.id);
+  };
+  const nombreLugar = lugares.find(l => l.nombre === distrito)?.etiqueta || distrito;
 
-  // Reloj en vivo
   useEffect(() => {
-    const timer = setInterval(() => {
-      const ahora = new Date();
-      setHoraActual(ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+    const controller = new AbortController();
+    setErrorLugares(false);
+    fetch(`${API}/distritos`, { signal: controller.signal })
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(lista => setLugares(actual => [...lista, ...actual.filter(l => l.etiqueta)])).catch(e => { if (e.name !== 'AbortError') setErrorLugares(true); });
+    return () => controller.abort();
+  }, [intento]);
 
-  const consultarSemaforo = async (nombreDistrito) => {
-    setDistrito(nombreDistrito);
-    try {
-      const respuesta = await fetch(`http://127.0.0.1:8000/semaforo/${nombreDistrito}`);
-      const datosJson = await respuesta.json();
-      setDatos(datosJson);
-    } catch (error) {
-      console.error("Error conectando con el backend", error);
-    }
+  useEffect(() => {
+    const controller = new AbortController();
+    setCargando(true); setError(''); setDatos(null);
+    fetch(`${API}/semaforo/${encodeURIComponent(distrito)}`, { signal: controller.signal })
+      .then(async r => { const body = await r.json(); if (!r.ok) throw new Error(body.detail); return body; })
+      .then(setDatos)
+      .catch(e => { if (e.name !== 'AbortError') setError(e.message || 'No se pudo conectar con el servidor.'); })
+      .finally(() => { if (!controller.signal.aborted) setCargando(false); });
+    return () => controller.abort();
+  }, [distrito, intento]);
+
+  const estados = {
+    rojo: ['Temperatura bajo cero', 'La temperatura mínima estimada fue de 0 °C o menos.'],
+    amarillo: ['Temperatura cercana a cero', 'La temperatura mínima estimada estuvo entre 0 y 4 °C.'],
+    verde: ['Temperatura superior a 4 °C', 'La temperatura mínima estimada superó los 4 °C.'],
   };
 
-  const t = textos[idioma]; 
-
-  // Función para elegir la foto, el mensaje de horas y el mensaje de alerta
-  const obtenerClima = (color) => {
-    if (color === 'verde') return { foto: 'sol.jpg', mensaje: t.soleado, alerta: t.msj_verde };
-    if (color === 'amarillo') return { foto: 'lluvia.jpg', mensaje: t.lluvia, alerta: t.msj_amarillo };
-    if (color === 'rojo') return { foto: 'helada.jpg', mensaje: t.helada, alerta: t.msj_rojo };
-    return { foto: 'sol.jpg', mensaje: t.soleado, alerta: t.msj_verde };
-  };
-
-  return (
-    <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
-      
-      <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center', position: 'relative' }}>
-        
-        {/* Reloj y Botón de Instalar (Izquierda y Derecha) */}
-        <div style={{ position: 'absolute', left: '20px', top: '20px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-           <span>{t.actualizado} {horaActual}</span>
-           <button onClick={() => alert("Para instalar: Toca el menú del navegador y selecciona 'Agregar a pantalla principal'")} style={{ padding: '5px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '12px', backgroundColor: '#FFF', color: '#2E7D32', fontWeight: 'bold' }}>{t.instalar}</button>
-        </div>
-
-        <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
-          <select onChange={(e) => setIdioma(e.target.value)} value={idioma} style={{ padding: '8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-            <option value="es">Español</option>
-            <option value="qu">Quechua</option>
-            <option value="en">English</option>
-          </select>
-        </div>
-
-        <div>{t.titulo}</div>
-        <p style={{ margin: 0, marginTop: '10px' }}>{t.subtitulo}</p>
-        
-        <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px' }}>
-          {['Huancayo', 'Chupuro', 'Tres de Diciembre', 'Viques', 'Sapallanga', 'Pucara', 'Ingenio', 'Huayucachi', 'Lago Junin', 'Ayacucho', 'Cangallo', 'Huanta', 'Vilcashuaman'].map((lugar) => (
-            <button key={lugar} onClick={() => consultarSemaforo(lugar)} style={{ padding: '6px 12px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '14px' }}>
-              {lugar}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ flex: 1, position: 'relative' }}>
-        <MapContainer center={[-12.5, -75.0]} zoom={7} style={{ height: '100%', width: '100%' }}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          
-          <Marker position={[-12.0651, -75.2049]}><Popup>Huancayo</Popup></Marker>
-          <Marker position={[-12.0800, -75.1900]}><Popup>Chupuro</Popup></Marker>
-          <Marker position={[-12.0500, -75.2200]}><Popup>Tres de Diciembre</Popup></Marker>
-          <Marker position={[-12.1500, -75.1500]}><Popup>Pucará</Popup></Marker>
-          <Marker position={[-12.1800, -75.1900]}><Popup>Viques</Popup></Marker>
-          <Marker position={[-12.1200, -75.1800]}><Popup>Sapallanga</Popup></Marker>
-          <Marker position={[-12.1000, -75.2500]}><Popup>Ingenio</Popup></Marker>
-          <Marker position={[-12.1300, -75.2300]}><Popup>Huayucachi</Popup></Marker>
-          <Marker position={[-11.0000, -76.0000]}><Popup>Lago Junín</Popup></Marker>
-          
-          <Marker position={[-13.1588, -74.2236]}><Popup>Ayacucho</Popup></Marker>
-          <Marker position={[-13.6300, -74.1400]}><Popup>Cangallo</Popup></Marker>
-          <Marker position={[-12.9300, -74.2500]}><Popup>Huanta</Popup></Marker>
-          <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
+  return <div className="app">
+    <header className="header">
+      <div className="brand"><img src="/logo.png" alt="Raíces Andinas" /><div><span>INFORMACIÓN PARA EL CAMPO</span><h1>Raíces Andinas</h1></div></div>
+      <nav className="top-nav" aria-label="Secciones"><a href="#clima">Clima</a><a href="#pronostico">Pronóstico</a><a href="#siembras">Siembras</a><a href="#parcela">Mi parcela</a><a href="#seguimiento">Mi cultivo</a><a href="#asistente">Asistente</a></nav>
+    </header>
+    <main className="layout" id="clima">
+      <section className="panel">
+        <p className="eyebrow">TU CAMPO, MEJOR INFORMADO</p>
+        <h2>Conoce el clima de tu zona</h2>
+        <p className="intro">Elige tu distrito para consultar las últimas condiciones disponibles y planificar tus siembras.</p>
+        <button className="primary-action" type="button" onClick={solicitarUbicacion}>📍 Mostrar mi ubicación</button><p className="search-hint" role="status">{estadoUbicacion}</p>
+        <Buscador seleccionar={seleccionarLugar} />
+        <label htmlFor="distrito">Selecciona un distrito</label>
+        <select id="distrito" value={distrito} onChange={e => setDistrito(e.target.value)} disabled={!lugares.length}>
+          {!lugares.length && <option value="Huancayo">Huancayo</option>}
+          {lugares.map(l => <option key={l.nombre} value={l.nombre}>{l.etiqueta || l.nombre}</option>)}
+        </select>
+        {errorLugares && <p className="error" role="alert">No se pudo cargar la lista de distritos. <button onClick={() => setIntento(i => i + 1)}>Reintentar</button></p>}
+        {cargando && <div className="notice" role="status">Consultando datos de NASA POWER…</div>}
+        {error && <div className="notice error" role="alert">{error} <button onClick={() => setIntento(i => i + 1)}>Reintentar</button></div>}
+        {datos && <article className="results">
+          <div className="result-heading"><div><p className="eyebrow">ÚLTIMO DÍA DISPONIBLE</p><h3>{nombreLugar}</h3></div><span className="date">{datos.fecha}</span></div>
+          <div className={`status ${datos.color}`}><span className="dot" /><div><strong>{estados[datos.color][0]}</strong><p>{estados[datos.color][1]}</p></div></div>
+          <div className="metrics">
+            <div><span>Temperatura media</span><strong>{formato(datos.temperatura, '°C')}</strong></div>
+            <div><span>Temperatura mínima</span><strong>{formato(datos.temperatura_minima, '°C')}</strong></div>
+            <div><span>Precipitación diaria</span><strong>{formato(datos.precipitacion, 'mm')}</strong></div>
+            <div><span>Humedad relativa del aire</span><strong>{formato(datos.humedad_relativa, '%')}</strong></div>
+          </div>
+          <p className="explanation">El indicador compara la temperatura mínima del día mostrado: rojo ≤ 0 °C, amarillo ≤ 4 °C y verde &gt; 4 °C. Es orientativo; no es un pronóstico ni una alerta oficial de helada.</p>
+          <p className="source">Fuente: NASA POWER · Datos diarios estimados para una celda regional, no una medición de tu parcela. Pueden publicarse con retraso. La humedad mostrada es del aire, no del suelo.</p>
+        </article>}
+      </section>
+      <section className="map" aria-label="Mapa de distritos">
+        <MapContainer center={[-12.55, -74.9]} zoom={7} maxZoom={21} scrollWheelZoom={false}>
+          <CentrarMapa lugar={lugares.find(l => l.nombre === distrito)} />
+          <CentrarUbicacion ubicacion={ubicacion} />
+          {vistaSatelital ? <TileLayer key="satelite" maxZoom={21} maxNativeZoom={19} attribution='Imágenes: Esri, Vantor, Earthstar Geographics y la comunidad GIS' url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" eventHandlers={{ tileerror: () => setErrorImagen(true) }} /> : <TileLayer key="mapa" maxZoom={21} maxNativeZoom={19} attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />}
+          {ubicacion && <CircleMarker center={[ubicacion.latitud, ubicacion.longitud]} radius={10} pathOptions={{ color: '#fff', weight: 3, fillColor: '#1975d1', fillOpacity: 1 }}><Popup>Tu ubicación actual aproximada (± {Math.round(ubicacion.precision)} m). Verifica que corresponda a tu parcela.</Popup></CircleMarker>}
+          {lugares.map(l => { const cultivos = referencias(l.nombre, mesSiembra); return <CircleMarker key={l.nombre} center={[l.latitud, l.longitud]} radius={l.nombre === distrito ? 10 : 7} pathOptions={{ color: l.nombre === distrito ? '#152f26' : '#fff', weight: l.nombre === distrito ? 3 : 2, fillColor: cultivos.length ? '#c67b1b' : '#64786c', fillOpacity: 1 }} eventHandlers={{ click: () => setDistrito(l.nombre) }}><Popup maxWidth={340} className="sowing-popup"><strong>{l.etiqueta || l.nombre} · {regiones[l.nombre]}</strong><p>Siembras en {new Date(2024, mesSiembra, 1).toLocaleDateString('es-PE', { month: 'long' })}</p>{cultivos.length ? fichasCultivos.filter(c => cultivos.includes(c.nombre)).map(c => <div className="popup-crop" key={c.nombre}><strong>{c.nombre}</strong><p><b>Referencia:</b> {c.periodo}</p><p><b>Factores:</b> {c.factores}</p><p><b>Riesgos:</b> {c.riesgos}</p></div>) : <p>No hay una ventana regional documentada en esta guía para este mes. Esto no significa que no se pueda sembrar.</p>}<p>Referencia regional, no evaluación de la parcela. Revisa agua, suelo, variedad y avisos locales.</p><a href="#siembras">Ver calendario y fichas completas</a></Popup></CircleMarker>; })}
         </MapContainer>
-
-        {/* Mensaje flotante guía en el mapa */}
-        {!datos && (
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '20px', borderRadius: '10px', zIndex: 1000, textAlign: 'center', boxShadow: '0 4px 8px rgba(0,0,0,0.3)' }}>
-            <h3 style={{ margin: 0, color: '#2E7D32' }}>{t.guia}</h3>
-          </div>
-        )}
-      </div>
-
-      {datos && (
-        <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 1000, backgroundColor: 'white', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.3)', width: '320px', overflow: 'hidden' }}>
-          
-          <div style={{ position: 'relative' }}>
-            <img src={obtenerClima(datos.color).foto} alt="Clima" style={{ width: '100%', height: '120px', objectFit: 'cover' }} />
-            <div style={{ position: 'absolute', bottom: '0', width: '100%', backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '5px', textAlign: 'center', fontSize: '13px', fontWeight: 'bold' }}>
-              {obtenerClima(datos.color).mensaje}
-            </div>
-          </div>
-
-          <div style={{ padding: '15px' }}>
-            
-            <div style={{ 
-              backgroundColor: '#F5F5F5', padding: '10px', borderRadius: '8px', marginBottom: '15px',
-              borderLeft: `5px solid ${datos.color === 'verde' ? '#4CAF50' : datos.color === 'amarillo' ? '#FFC107' : '#F44336'}`
-            }}>
-              <p style={{ margin: 0, fontSize: '14px', fontStyle: 'italic', color: '#333' }}>
-                {obtenerClima(datos.color).alerta}
-              </p>
-            </div>
-
-            <h3 style={{ margin: '0 0 10px 0' }}>{t.resultados}: {distrito}</h3>
-            
-            <p style={{ margin: '5px 0' }}><strong>{t.semaforo}:</strong> 
-              <span style={{ display: 'inline-block', width: '15px', height: '15px', borderRadius: '50%', marginLeft: '10px', backgroundColor: datos.color === 'verde' ? '#4CAF50' : datos.color === 'amarillo' ? '#FFC107' : datos.color === 'rojo' ? '#F44336' : 'gray' }}></span>
-            </p>
-            <p style={{ margin: '5px 0' }}><strong>{t.humedad}:</strong> {datos.humedad}</p>
-            <p style={{ margin: '5px 0' }}><strong>{t.temperatura}:</strong> {datos.temperatura} °C</p>
-            
-            <div style={{ marginTop: '10px' }}>
-              <strong>{t.heladas}: </strong>
-              {datos.alerta_heladas ? (
-                <span style={{ backgroundColor: '#F44336', color: 'white', padding: '4px 8px', borderRadius: '5px', fontSize: '13px', marginLeft: '5px', fontWeight: 'bold' }}>
-                  ⚠️ {t.si} - {t.peligro}
-                </span>
-              ) : (
-                <span style={{ color: 'green', marginLeft: '5px', fontWeight: 'bold' }}>{t.no}</span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+        <div className="map-view-control" role="group" aria-label="Vista del mapa"><span className="map-control-label">TIPO DE VISTA</span><div className="map-view-buttons"><button type="button" aria-pressed={!vistaSatelital} onClick={() => { setVistaSatelital(false); setErrorImagen(false); }}>Mapa</button><button type="button" aria-pressed={vistaSatelital} onClick={() => { setErrorImagen(false); setVistaSatelital(true); }}>Satélite</button></div>{vistaSatelital && <p>Usa + para acercarte. La fecha y resolución varían; el último acercamiento amplía la imagen disponible.</p>}{errorImagen && vistaSatelital && <p role="alert">No se pudieron cargar algunas imágenes. Comprueba tu conexión o vuelve a la vista de mapa.</p>}</div>
+        <div className="map-note"><label htmlFor="mes-mapa"><strong>Siembras por zona</strong></label><span className="map-note-caption">Elige un mes</span><select id="mes-mapa" value={mesSiembra} onChange={e => setMesSiembra(Number(e.target.value))}>{Array.from({length: 12}, (_, i) => <option key={i} value={i}>{new Date(2024, i, 1).toLocaleDateString('es-PE', {month: 'long'})}</option>)}</select><div className="map-legend"><div><span className="legend-dot has-reference" /> Con referencia regional</div><div><span className="legend-dot no-reference" /> Sin referencia en la guía</div></div><small>Toca un punto para ver detalles. El borde oscuro señala la zona elegida.</small></div>
+      </section>
+    </main>
+    <Calendario distrito={distrito} nombreLugar={nombreLugar} />
+    <Ecostress distrito={distrito} nombreLugar={nombreLugar} datos={datos?.distrito === distrito ? datos : null} />
+    <Siembras distrito={distrito} nombreLugar={nombreLugar} lugares={lugares} setDistrito={setDistrito} mes={mesSiembra} setMes={setMesSiembra} />
+    <FichaParcela ficha={ficha} setFicha={setFicha} datos={datos?.distrito === distrito ? datos : null} nombreLugar={nombreLugar} lugar={lugares.find(l => l.nombre === distrito)} />
+    <Seguimiento ubicacion={ubicacion} solicitarUbicacion={solicitarUbicacion} estadoUbicacion={estadoUbicacion} />
+    <Asistente distrito={distrito} nombreLugar={nombreLugar} mes={mesSiembra} datos={datos?.distrito === distrito ? datos : null} ficha={ficha} />
+  </div>;
 }
-
 export default App;
