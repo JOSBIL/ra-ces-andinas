@@ -11,12 +11,11 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// Animación para la alpaca
 const estiloAnimacion = `
   @keyframes caminar {
-    0% { transform: translateX(0px); }
-    50% { transform: translateX(60px); }
-    100% { transform: translateX(0px); }
+    0% { transform: translateX(-20px); }
+    50% { transform: translateX(20px); }
+    100% { transform: translateX(-20px); }
   }
 `;
 
@@ -32,6 +31,8 @@ const textos = {
     msj_rojo: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy es alerta de caída de helada. Se advierte tomar precauciones para prevenir pérdidas de cultivos.",
     instalar: "📲 Instalar App",
     actualizado: "Actualizado: ",
+    bienvenida: "¡Bienvenido a Raíces Andinas!",
+    toca_para_entrar: "Toca en cualquier lugar para entrar",
     alpaca_hola: "¡Hola amigo! Soy tu alpaca asistente. 🦙",
     alpaca_instruccion: "Elige un distrito arriba para ver el clima de hoy."
   },
@@ -46,6 +47,8 @@ const textos = {
     msj_rojo: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa chullu yaykuyninmi. ¡Allichakuy, chakraykita ama chinkachinaykipaq!",
     instalar: "📲 App churay",
     actualizado: "Kunan: ",
+    bienvenida: "¡Allillanchu Raíces Andinasman!",
+    toca_para_entrar: "Maypiña ñit'iy yaykunaykipaq",
     alpaca_hola: "¡Allillanchu amigu! Ñuqa alpaca yanapakuyniyki. 🦙",
     alpaca_instruccion: "Huk distritota akllay, kunan p'unchaw clima rikunaykipaq."
   },
@@ -60,6 +63,8 @@ const textos = {
     msj_rojo: "Hello friend! I am Raíces Andinas. Today's weather is a frost alert. Precautions are advised to prevent crop losses.",
     instalar: "📲 Install App",
     actualizado: "Updated: ",
+    bienvenida: "Welcome to Andean Roots!",
+    toca_para_entrar: "Tap anywhere to enter",
     alpaca_hola: "Hello friend! I am your alpaca assistant. 🦙",
     alpaca_instruccion: "Select a district above to see today's weather."
   }
@@ -70,6 +75,7 @@ function App() {
   const [datos, setDatos] = useState(null);
   const [idioma, setIdioma] = useState('es'); 
   const [horaActual, setHoraActual] = useState('');
+  const [mostrarBienvenida, setMostrarBienvenida] = useState(true); // Estado para la pantalla verde
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -100,13 +106,31 @@ function App() {
   };
 
   return (
-    <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       
+      {/* PANTALLA DE BIENVENIDA VERDE */}
+      {mostrarBienvenida && (
+        <div 
+          onClick={() => setMostrarBienvenida(false)} 
+          style={{ 
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', 
+            backgroundColor: '#2E7D32', zIndex: 9999, display: 'flex', flexDirection: 'column',
+            justifyContent: 'center', alignItems: 'center', cursor: 'pointer', color: 'white'
+          }}
+        >
+          <style>{estiloAnimacion}</style>
+          <img src="logo.png" alt="Logo" style={{ height: '100px', marginBottom: '20px' }} />
+          <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', textAlign: 'center' }}>{t.bienvenida}</h1>
+          <p style={{ fontSize: '16px', margin: '0 0 30px 0', opacity: 0.8 }}>{t.toca_para_entrar}</p>
+          <div style={{ fontSize: '120px', animation: 'caminar 3s infinite ease-in-out' }}>🦙</div>
+        </div>
+      )}
+
       <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center', position: 'relative' }}>
         
         <div style={{ position: 'absolute', left: '20px', top: '20px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
            <span>{t.actualizado} {horaActual}</span>
-           <button onClick={() => alert("Para instalar: Toca el menú del navegador y selecciona 'Agregar a pantalla principal'")} style={{ padding: '5px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '12px', backgroundColor: '#FFF', color: '#2E7D32', fontWeight: 'bold' }}>{t.instalar}</button>
+           <button onClick={(e) => { e.stopPropagation(); alert("Para instalar: Toca el menú del navegador y selecciona 'Agregar a pantalla principal'") }} style={{ padding: '5px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '12px', backgroundColor: '#FFF', color: '#2E7D32', fontWeight: 'bold' }}>{t.instalar}</button>
         </div>
 
         <div style={{ position: 'absolute', right: '20px', top: '20px' }}>
@@ -149,14 +173,12 @@ function App() {
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
 
-        {/* Mascota Alpaca Animada y Centrada */}
+        {/* Alpaca Guía en el mapa */}
         {!datos && (
           <div style={{ 
             position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)', 
             zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center'
           }}>
-            <style>{estiloAnimacion}</style>
-            
             <div style={{ 
               backgroundColor: 'white', padding: '15px', borderRadius: '15px', 
               boxShadow: '0 4px 8px rgba(0,0,0,0.3)', marginBottom: '10px',
@@ -170,7 +192,6 @@ function App() {
               </p>
             </div>
             
-            {/* La alpaca con la animación */}
             <div style={{ 
               fontSize: '80px', 
               animation: 'caminar 4s infinite ease-in-out',
