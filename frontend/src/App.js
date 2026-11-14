@@ -11,10 +11,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
+// Nueva animación: Saltar y saludar
 const estiloAnimacion = `
-  @keyframes caminar {
+  @keyframes saltar {
     0% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(5deg); }
+    30% { transform: translateY(-30px) rotate(5deg); }
+    50% { transform: translateY(0px) rotate(0deg); }
+    70% { transform: translateY(-15px) rotate(-5deg); }
     100% { transform: translateY(0px) rotate(0deg); }
   }
 `;
@@ -108,7 +111,7 @@ function App() {
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       
-      {/* PANTALLA DE BIENVENIDA VERDE CON LA NUEVA MASCOTA */}
+      {/* PANTALLA DE BIENVENIDA VERDE CON MASCOTA SALTANDO */}
       {mostrarBienvenida && (
         <div 
           onClick={() => setMostrarBienvenida(false)} 
@@ -123,11 +126,11 @@ function App() {
           <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', textAlign: 'center' }}>{t.bienvenida}</h1>
           <p style={{ fontSize: '16px', margin: '0 0 30px 0', opacity: 0.8 }}>{t.toca_para_entrar}</p>
           
-          {/* Imagen de la nueva mascota */}
+          {/* Mascota con animación de salto */}
           <img 
             src="mascota.png" 
             alt="Mascota" 
-            style={{ height: '200px', animation: 'caminar 3s infinite ease-in-out', filter: 'drop-shadow(0px 10px 10px rgba(0,0,0,0.3))' }} 
+            style={{ height: '200px', animation: 'saltar 1.5s infinite ease-in-out', filter: 'drop-shadow(0px 10px 10px rgba(0,0,0,0.3))' }} 
           />
         </div>
       )}
@@ -179,7 +182,7 @@ function App() {
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
 
-        {/* Mascota Guía en el mapa */}
+        {/* Mascota Guía en el mapa (también salta) */}
         {!datos && (
           <div style={{ 
             position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)', 
@@ -198,11 +201,10 @@ function App() {
               </p>
             </div>
             
-            {/* Imagen de la mascota en el mapa */}
             <img 
               src="mascota.png" 
               alt="Mascota" 
-              style={{ height: '100px', animation: 'caminar 4s infinite ease-in-out', filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' }} 
+              style={{ height: '100px', animation: 'saltar 1.5s infinite ease-in-out', filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' }} 
             />
           </div>
         )}
