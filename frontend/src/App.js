@@ -22,8 +22,9 @@ const textos = {
     msj_amarillo: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy presenta lluvias ligeras. Te recomiendo tomar precauciones y proteger tus cultivos.",
     msj_rojo: "¡Hola amigo! Soy Raíces Andinas. El clima de hoy es alerta de caída de helada. Se advierte tomar precauciones para prevenir pérdidas de cultivos.",
     instalar: "📲 Instalar App",
-    guia: "👋 ¡Hola! Selecciona un distrito arriba para ver el clima",
-    actualizado: "Actualizado: "
+    actualizado: "Actualizado: ",
+    alpaca_hola: "¡Hola amigo! Soy tu alpaca asistente. 🦙",
+    alpaca_instruccion: "Elige un distrito arriba para ver el clima de hoy."
   },
   qu: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -35,8 +36,9 @@ const textos = {
     msj_amarillo: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa param kachkanmi. Allichakuy, chakraykita waqaychay.",
     msj_rojo: "¡Allillanchu amigu! Ñuqa Raíces Andinasmi kani. Kunan p'unchawqa chullu yaykuyninmi. ¡Allichakuy, chakraykita ama chinkachinaykipaq!",
     instalar: "📲 App churay",
-    guia: "👋 ¡Allillanchu! Huk distritota akllay",
-    actualizado: "Kunan: "
+    actualizado: "Kunan: ",
+    alpaca_hola: "¡Allillanchu amigu! Ñuqa alpaca yanapakuyniyki. 🦙",
+    alpaca_instruccion: "Huk distritota akllay, kunan p'unchaw clima rikunaykipaq."
   },
   en: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -48,8 +50,9 @@ const textos = {
     msj_amarillo: "Hello friend! I am Raíces Andinas. Today's weather shows light rain. I recommend taking precautions and protecting your crops.",
     msj_rojo: "Hello friend! I am Raíces Andinas. Today's weather is a frost alert. Precautions are advised to prevent crop losses.",
     instalar: "📲 Install App",
-    guia: "👋 Hello! Select a district above to see the weather",
-    actualizado: "Updated: "
+    actualizado: "Updated: ",
+    alpaca_hola: "Hello friend! I am your alpaca assistant. 🦙",
+    alpaca_instruccion: "Select a district above to see today's weather."
   }
 };
 
@@ -59,7 +62,6 @@ function App() {
   const [idioma, setIdioma] = useState('es'); 
   const [horaActual, setHoraActual] = useState('');
 
-  // Reloj en vivo
   useEffect(() => {
     const timer = setInterval(() => {
       const ahora = new Date();
@@ -81,7 +83,6 @@ function App() {
 
   const t = textos[idioma]; 
 
-  // Función para elegir la foto, el mensaje de horas y el mensaje de alerta
   const obtenerClima = (color) => {
     if (color === 'verde') return { foto: 'sol.jpg', mensaje: t.soleado, alerta: t.msj_verde };
     if (color === 'amarillo') return { foto: 'lluvia.jpg', mensaje: t.lluvia, alerta: t.msj_amarillo };
@@ -94,7 +95,6 @@ function App() {
       
       <div style={{ padding: '15px', backgroundColor: '#2E7D32', color: 'white', textAlign: 'center', position: 'relative' }}>
         
-        {/* Reloj y Botón de Instalar (Izquierda y Derecha) */}
         <div style={{ position: 'absolute', left: '20px', top: '20px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
            <span>{t.actualizado} {horaActual}</span>
            <button onClick={() => alert("Para instalar: Toca el menú del navegador y selecciona 'Agregar a pantalla principal'")} style={{ padding: '5px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '12px', backgroundColor: '#FFF', color: '#2E7D32', fontWeight: 'bold' }}>{t.instalar}</button>
@@ -140,10 +140,27 @@ function App() {
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
 
-        {/* Mensaje flotante guía en el mapa */}
+        {/* MASCOTA ALPACA - Reemplaza al mensaje flotante anterior */}
         {!datos && (
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '20px', borderRadius: '10px', zIndex: 1000, textAlign: 'center', boxShadow: '0 4px 8px rgba(0,0,0,0.3)' }}>
-            <h3 style={{ margin: 0, color: '#2E7D32' }}>{t.guia}</h3>
+          <div style={{ 
+            position: 'absolute', bottom: '30px', right: '30px', zIndex: 1000, 
+            display: 'flex', flexDirection: 'column', alignItems: 'center'
+          }}>
+            <div style={{ 
+              backgroundColor: 'white', padding: '15px', borderRadius: '15px', 
+              boxShadow: '0 4px 8px rgba(0,0,0,0.3)', marginBottom: '10px',
+              border: '2px solid #2E7D32', maxWidth: '250px', textAlign: 'center'
+            }}>
+              <p style={{ margin: 0, fontSize: '14px', fontWeight: 'bold', color: '#2E7D32' }}>
+                {t.alpaca_hola}
+              </p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#333' }}>
+                {t.alpaca_instruccion}
+              </p>
+            </div>
+            <div style={{ fontSize: '80px', filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' }}>
+              🦙
+            </div>
           </div>
         )}
       </div>
