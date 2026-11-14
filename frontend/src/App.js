@@ -11,14 +11,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// Nueva animación: Saltar y saludar
+// Animación de salto para la imagen estática
 const estiloAnimacion = `
   @keyframes saltar {
-    0% { transform: translateY(0px) rotate(0deg); }
-    30% { transform: translateY(-30px) rotate(5deg); }
-    50% { transform: translateY(0px) rotate(0deg); }
-    70% { transform: translateY(-15px) rotate(-5deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
+    0% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+    100% { transform: translateY(0px) scale(1); }
   }
 `;
 
@@ -111,7 +109,7 @@ function App() {
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       
-      {/* PANTALLA DE BIENVENIDA VERDE CON MASCOTA SALTANDO */}
+      {/* PANTALLA DE BIENVENIDA VERDE CON LA IMAGEN ANIMADA */}
       {mostrarBienvenida && (
         <div 
           onClick={() => setMostrarBienvenida(false)} 
@@ -126,7 +124,6 @@ function App() {
           <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', textAlign: 'center' }}>{t.bienvenida}</h1>
           <p style={{ fontSize: '16px', margin: '0 0 30px 0', opacity: 0.8 }}>{t.toca_para_entrar}</p>
           
-          {/* Mascota con animación de salto */}
           <img 
             src="mascota.png" 
             alt="Mascota" 
@@ -182,7 +179,7 @@ function App() {
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
 
-        {/* Mascota Guía en el mapa (también salta) */}
+        {/* Mascota Guía en el mapa (Imagen Animada) */}
         {!datos && (
           <div style={{ 
             position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)', 
