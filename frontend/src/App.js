@@ -11,15 +11,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-// Animación de salto para la imagen estática
-const estiloAnimacion = `
-  @keyframes saltar {
-    0% { transform: translateY(0px) scale(1); }
-    50% { transform: translateY(-20px) scale(1.05); }
-    100% { transform: translateY(0px) scale(1); }
-  }
-`;
-
 const textos = {
   es: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -109,7 +100,7 @@ function App() {
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       
-      {/* PANTALLA DE BIENVENIDA VERDE CON LA IMAGEN ANIMADA */}
+      {/* PANTALLA DE BIENVENIDA VERDE CON EL VIDEO */}
       {mostrarBienvenida && (
         <div 
           onClick={() => setMostrarBienvenida(false)} 
@@ -119,15 +110,17 @@ function App() {
             justifyContent: 'center', alignItems: 'center', cursor: 'pointer', color: 'white'
           }}
         >
-          <style>{estiloAnimacion}</style>
           <img src="logo.png" alt="Logo" style={{ height: '100px', marginBottom: '20px' }} />
           <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', textAlign: 'center' }}>{t.bienvenida}</h1>
           <p style={{ fontSize: '16px', margin: '0 0 30px 0', opacity: 0.8 }}>{t.toca_para_entrar}</p>
           
-          <img 
-            src="mascota.png" 
-            alt="Mascota" 
-            style={{ height: '200px', animation: 'saltar 1.5s infinite ease-in-out', filter: 'drop-shadow(0px 10px 10px rgba(0,0,0,0.3))' }} 
+          <video 
+            src="mascota.webm" 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            style={{ height: '250px', mixBlendMode: 'screen', filter: 'drop-shadow(0px 10px 10px rgba(0,0,0,0.3))' }} 
           />
         </div>
       )}
@@ -179,7 +172,7 @@ function App() {
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
 
-        {/* Mascota Guía en el mapa (Imagen Animada) */}
+        {/* Mascota Guía en el mapa (Video) */}
         {!datos && (
           <div style={{ 
             position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)', 
@@ -198,10 +191,13 @@ function App() {
               </p>
             </div>
             
-            <img 
-              src="mascota.png" 
-              alt="Mascota" 
-              style={{ height: '100px', animation: 'saltar 1.5s infinite ease-in-out', filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' }} 
+            <video 
+              src="mascota.webm" 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              style={{ height: '120px', mixBlendMode: 'screen', filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' }} 
             />
           </div>
         )}
