@@ -13,9 +13,9 @@ L.Icon.Default.mergeOptions({
 
 const estiloAnimacion = `
   @keyframes caminar {
-    0% { transform: translateX(-20px); }
-    50% { transform: translateX(20px); }
-    100% { transform: translateX(-20px); }
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
   }
 `;
 
@@ -33,8 +33,8 @@ const textos = {
     actualizado: "Actualizado: ",
     bienvenida: "¡Bienvenido a Raíces Andinas!",
     toca_para_entrar: "Toca en cualquier lugar para entrar",
-    alpaca_hola: "¡Hola amigo! Soy tu alpaca asistente. 🦙",
-    alpaca_instruccion: "Elige un distrito arriba para ver el clima de hoy."
+    mascota_hola: "¡Hola amigo! Soy tu asistente. 🤖",
+    mascota_instruccion: "Elige un distrito arriba para ver el clima de hoy."
   },
   qu: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -49,8 +49,8 @@ const textos = {
     actualizado: "Kunan: ",
     bienvenida: "¡Allillanchu Raíces Andinasman!",
     toca_para_entrar: "Maypiña ñit'iy yaykunaykipaq",
-    alpaca_hola: "¡Allillanchu amigu! Ñuqa alpaca yanapakuyniyki. 🦙",
-    alpaca_instruccion: "Huk distritota akllay, kunan p'unchaw clima rikunaykipaq."
+    mascota_hola: "¡Allillanchu amigu! Ñuqa yanapakuyniyki. 🤖",
+    mascota_instruccion: "Huk distritota akllay, kunan p'unchaw clima rikunaykipaq."
   },
   en: {
     titulo: <img src="logo.png" alt="Raíces Andinas" style={{ height: '60px', margin: '0 auto', display: 'block' }} />,
@@ -65,8 +65,8 @@ const textos = {
     actualizado: "Updated: ",
     bienvenida: "Welcome to Andean Roots!",
     toca_para_entrar: "Tap anywhere to enter",
-    alpaca_hola: "Hello friend! I am your alpaca assistant. 🦙",
-    alpaca_instruccion: "Select a district above to see today's weather."
+    mascota_hola: "Hello friend! I am your assistant. 🤖",
+    mascota_instruccion: "Select a district above to see today's weather."
   }
 };
 
@@ -75,7 +75,7 @@ function App() {
   const [datos, setDatos] = useState(null);
   const [idioma, setIdioma] = useState('es'); 
   const [horaActual, setHoraActual] = useState('');
-  const [mostrarBienvenida, setMostrarBienvenida] = useState(true); // Estado para la pantalla verde
+  const [mostrarBienvenida, setMostrarBienvenida] = useState(true); 
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -108,7 +108,7 @@ function App() {
   return (
     <div style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       
-      {/* PANTALLA DE BIENVENIDA VERDE */}
+      {/* PANTALLA DE BIENVENIDA VERDE CON LA NUEVA MASCOTA */}
       {mostrarBienvenida && (
         <div 
           onClick={() => setMostrarBienvenida(false)} 
@@ -122,7 +122,13 @@ function App() {
           <img src="logo.png" alt="Logo" style={{ height: '100px', marginBottom: '20px' }} />
           <h1 style={{ fontSize: '28px', margin: '0 0 10px 0', textAlign: 'center' }}>{t.bienvenida}</h1>
           <p style={{ fontSize: '16px', margin: '0 0 30px 0', opacity: 0.8 }}>{t.toca_para_entrar}</p>
-          <div style={{ fontSize: '120px', animation: 'caminar 3s infinite ease-in-out' }}>🦙</div>
+          
+          {/* Imagen de la nueva mascota */}
+          <img 
+            src="mascota.png" 
+            alt="Mascota" 
+            style={{ height: '200px', animation: 'caminar 3s infinite ease-in-out', filter: 'drop-shadow(0px 10px 10px rgba(0,0,0,0.3))' }} 
+          />
         </div>
       )}
 
@@ -173,7 +179,7 @@ function App() {
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
 
-        {/* Alpaca Guía en el mapa */}
+        {/* Mascota Guía en el mapa */}
         {!datos && (
           <div style={{ 
             position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)', 
@@ -185,20 +191,19 @@ function App() {
               border: '2px solid #2E7D32', maxWidth: '250px', textAlign: 'center'
             }}>
               <p style={{ margin: 0, fontSize: '14px', fontWeight: 'bold', color: '#2E7D32' }}>
-                {t.alpaca_hola}
+                {t.mascota_hola}
               </p>
               <p style={{ margin: '5px 0 0 0', fontSize: '13px', color: '#333' }}>
-                {t.alpaca_instruccion}
+                {t.mascota_instruccion}
               </p>
             </div>
             
-            <div style={{ 
-              fontSize: '80px', 
-              animation: 'caminar 4s infinite ease-in-out',
-              filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' 
-            }}>
-              🦙
-            </div>
+            {/* Imagen de la mascota en el mapa */}
+            <img 
+              src="mascota.png" 
+              alt="Mascota" 
+              style={{ height: '100px', animation: 'caminar 4s infinite ease-in-out', filter: 'drop-shadow(0px 4px 4px rgba(0,0,0,0.3))' }} 
+            />
           </div>
         )}
       </div>
