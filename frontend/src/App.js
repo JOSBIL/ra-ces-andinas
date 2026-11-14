@@ -140,11 +140,11 @@ function App() {
           <Marker position={[-13.6500, -73.9500]}><Popup>Vilcashuamán</Popup></Marker>
         </MapContainer>
 
-        {/* MASCOTA ALPACA - Reemplaza al mensaje flotante anterior */}
+        {/* Mascota Alpaca Guía en el mapa (CENTRADA) */}
         {!datos && (
           <div style={{ 
-            position: 'absolute', bottom: '30px', right: '30px', zIndex: 1000, 
-            display: 'flex', flexDirection: 'column', alignItems: 'center'
+            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', 
+            zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center'
           }}>
             <div style={{ 
               backgroundColor: 'white', padding: '15px', borderRadius: '15px', 
